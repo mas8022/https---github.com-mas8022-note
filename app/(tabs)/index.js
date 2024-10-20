@@ -154,7 +154,7 @@ export default function App() {
                 <FontAwesome
                   name={isChecked ? "check-square-o" : "square-o"}
                   size={24}
-                  color="#6200ea"
+                  color="#C"
                 />
               </TouchableOpacity>
               <Text
