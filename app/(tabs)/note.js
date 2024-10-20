@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   TextInput,
   View,
@@ -7,39 +7,82 @@ import {
   ScrollView,
   Animated,
   TouchableOpacity,
+  Alert,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function TabTwoScreen() {
   const [note, setNote] = useState("");
   const [savedNotes, setSavedNotes] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
-  const fadeAnim = useRef(new Animated.Value(0)).current; // For animation
+  const fadeAnim = useRef(new Animated.Value(0)).current; // For fade-in animation
+  const scaleAnim = useRef(new Animated.Value(0.8)).current; // For scaling animation
 
-  // Animation effect
-  const fadeIn = () => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
+  // Load saved notes from AsyncStorage
+  useEffect(() => {
+    const loadNotes = async () => {
+      try {
+        const storedNotes = await AsyncStorage.getItem("notes");
+        if (storedNotes) {
+          setSavedNotes(JSON.parse(storedNotes));
+        }
+      } catch (error) {
+        Alert.alert("Error", "Failed to load notes");
+      }
+    };
+
+    loadNotes();
+  }, []);
+
+  // Save notes to AsyncStorage
+  const saveNotesToStorage = async (notes) => {
+    try {
+      await AsyncStorage.setItem("notes", JSON.stringify(notes));
+    } catch (error) {
+      Alert.alert("Error", "Failed to save notes");
+    }
   };
+
+  // Animation effect for empty message
+  const fadeIn = () => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 5,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  useEffect(() => {
+    if (savedNotes.length === 0) {
+      fadeIn(); // Trigger animation when no notes
+    }
+  }, [savedNotes]);
 
   const handleCreateOrEditNote = () => {
     if (note.trim()) {
+      let updatedNotes;
       if (isEditing && currentIndex !== null && !!savedNotes.length) {
         // Edit existing note
-        const updatedNotes = [...savedNotes];
+        updatedNotes = [...savedNotes];
         updatedNotes[currentIndex].text = note;
-        setSavedNotes(updatedNotes);
         setIsEditing(false);
         setCurrentIndex(null);
       } else {
         // Create new note
-        setSavedNotes([...savedNotes, { text: note }]);
+        updatedNotes = [...savedNotes, { text: note }];
       }
+
+      setSavedNotes(updatedNotes);
+      saveNotesToStorage(updatedNotes);
       setNote("");
-      fadeIn(); // Trigger fade in animation
     }
   };
 
@@ -50,18 +93,32 @@ export default function TabTwoScreen() {
   };
 
   const handleDeleteNote = (index) => {
-    setSavedNotes(savedNotes.filter((_, i) => i !== index));
+    const updatedNotes = savedNotes.filter((_, i) => i !== index);
+    setSavedNotes(updatedNotes);
+    saveNotesToStorage(updatedNotes);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Notes App</Text>
 
-      {/* Display saved notes with delete/edit options */}
-      <ScrollView style={styles.notesContainer}>
-        {savedNotes.map((item, index) => (
-          <Animated.View key={index} style={{ opacity: fadeAnim }}>
-            <View style={styles.note}>
+      {/* Display message if no notes exist */}
+      {savedNotes.length === 0 ? (
+        <Animated.View
+          style={[
+            styles.emptyContainer,
+            {
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }],
+            },
+          ]}
+        >
+          <Text style={styles.emptyText}>There are no notes!</Text>
+        </Animated.View>
+      ) : (
+        <ScrollView style={styles.notesContainer}>
+          {savedNotes.map((item, index) => (
+            <View key={index} style={styles.note}>
               <ScrollView style={styles.scrollableText}>
                 <Text style={styles.noteText}>{item.text}</Text>
               </ScrollView>
@@ -82,9 +139,9 @@ export default function TabTwoScreen() {
                 </TouchableOpacity>
               </View>
             </View>
-          </Animated.View>
-        ))}
-      </ScrollView>
+          ))}
+        </ScrollView>
+      )}
 
       {/* Input note section */}
       <TextInput
@@ -112,14 +169,25 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: "space-between",
-    backgroundColor: "#ffffff", // White background
+    backgroundColor: "#ffffff",
   },
   title: {
     fontSize: 26,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    color: "#6200ea", // Theme color
+    color: "#6200ea",
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 50,
+  },
+  emptyText: {
+    fontSize: 22,
+    color: "#6200ea",
+    fontStyle: "italic",
   },
   input: {
     height: 50,
@@ -139,7 +207,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
     borderRadius: 10,
     marginVertical: 5,
-    borderColor: "#6200ea", // Theme color border
+    borderColor: "#6200ea",
     borderWidth: 1,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -147,7 +215,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   scrollableText: {
-    maxHeight: 200, // Limit height to avoid overflowing
+    maxHeight: 200,
   },
   noteText: {
     fontSize: 20,

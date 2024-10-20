@@ -158,7 +158,7 @@ export default function App() {
                 />
               </TouchableOpacity>
               <Text
-                style={[styles.taskText, !isChecked && styles.checkedTaskText]}
+                style={[styles.taskText, isChecked && styles.checkedTaskText]}
               >
                 {item.text}
               </Text>
@@ -206,6 +206,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#fff",
     marginBottom: 20,
+    fontSize: 20,
   },
   addButton: {
     backgroundColor: "#6200ea",
