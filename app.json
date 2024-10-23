@@ -31,6 +31,18 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "147782fe-b8e5-46d3-bc92-792ff163e76d"
+      }
+    },
+    "owner": "mas2002",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/147782fe-b8e5-46d3-bc92-792ff163e76d"
     }
   }
 }
