@@ -8,7 +8,6 @@ const ReminderPage = () => {
   const [reminderMessage, setReminderMessage] = useState(''); // User's message
   const [reminders, setReminders] = useState([]); // List of reminders
   const [isPickerVisible, setPickerVisibility] = useState(false); // Time picker visibility
-  const [isDarkMode, setDarkMode] = useState(false); // Dark mode toggle
 
   // Show time picker
   const showTimePicker = () => {
@@ -85,7 +84,7 @@ const ReminderPage = () => {
             <Text style={styles.reminderTime}>{new Date(item.time).toLocaleTimeString()}</Text>
           </View>
           <TouchableOpacity onPress={() => handleRemoveReminder(item.id)}>
-            <MaterialIcons name="delete" size={30} color={isDarkMode ? '#ffffff' : '#6200ea'} />
+            <MaterialIcons name="delete" size={30} color="#6200ea" />
           </TouchableOpacity>
         </View>
       </View>
@@ -93,10 +92,7 @@ const ReminderPage = () => {
   };
 
   return (
-    <View style={isDarkMode ? styles.containerDark : styles.container}>
-      <TouchableOpacity onPress={() => setDarkMode(!isDarkMode)}>
-        <Text style={styles.toggleText}>{isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</Text>
-      </TouchableOpacity>
+    <View style={styles.container}>
       <Text style={styles.title}>Set Reminder</Text>
 
       <TouchableOpacity style={styles.inputContainer} onPress={showTimePicker}>
@@ -117,7 +113,6 @@ const ReminderPage = () => {
         placeholder="Enter your reminder message"
         value={reminderMessage}
         onChangeText={setReminderMessage}
-        placeholderTextColor={isDarkMode ? '#cccccc' : '#aaaaaa'}
       />
 
       <TouchableOpacity style={styles.button} onPress={handleSetReminder}>
@@ -141,23 +136,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#f5f5f5',
   },
-  containerDark: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-    backgroundColor: '#1c1c1c',
-  },
   title: {
     fontSize: 24,
     marginBottom: 20,
     textAlign: 'center',
     color: '#333',
-  },
-  toggleText: {
-    textAlign: 'center',
-    fontSize: 16,
-    color: '#6200ea',
-    marginBottom: 20,
   },
   inputContainer: {
     borderWidth: 1,
@@ -178,8 +161,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     fontSize: 16,
     textAlign: 'center',
-    color: '#333',
-    backgroundColor: '#fff', // Add background color for light mode
   },
   button: {
     backgroundColor: '#6200ea',

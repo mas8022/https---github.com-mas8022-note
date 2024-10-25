@@ -16,7 +16,6 @@ export default function TabTwoScreen() {
   const [savedNotes, setSavedNotes] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
-  const [darkMode, setDarkMode] = useState(false); // State for dark mode
   const fadeAnim = useRef(new Animated.Value(0)).current; // For fade-in animation
   const scaleAnim = useRef(new Animated.Value(0.8)).current; // For scaling animation
 
@@ -100,13 +99,8 @@ export default function TabTwoScreen() {
   };
 
   return (
-    <View style={[styles.container, darkMode && styles.darkContainer]}>
-      <Text style={[styles.title, darkMode && styles.darkTitle]}>Notes App</Text>
-
-      {/* Dark Mode Toggle */}
-      <TouchableOpacity style={styles.toggleButton} onPress={() => setDarkMode(!darkMode)}>
-        <Text style={styles.toggleButtonText}>{darkMode ? "Light Mode" : "Dark Mode"}</Text>
-      </TouchableOpacity>
+    <View style={styles.container}>
+      <Text style={styles.title}>Notes App</Text>
 
       {/* Display message if no notes exist */}
       {savedNotes.length === 0 ? (
@@ -119,26 +113,26 @@ export default function TabTwoScreen() {
             },
           ]}
         >
-          <Text style={[styles.emptyText, darkMode && styles.darkEmptyText]}>There are no notes!</Text>
+          <Text style={styles.emptyText}>There are no notes!</Text>
         </Animated.View>
       ) : (
-        <ScrollView style={[styles.notesContainer, darkMode && styles.darkNotesContainer]}>
+        <ScrollView style={styles.notesContainer}>
           {savedNotes.map((item, index) => (
-            <View key={index} style={[styles.note, darkMode && styles.darkNote]}>
+            <View key={index} style={styles.note}>
               <ScrollView style={styles.scrollableText}>
-                <Text style={[styles.noteText, darkMode && styles.darkNoteText]}>{item.text}</Text>
+                <Text style={styles.noteText}>{item.text}</Text>
               </ScrollView>
 
               <View style={styles.actions}>
                 <TouchableOpacity
-                  style={[styles.editButton, darkMode && styles.darkEditButton]}
+                  style={styles.editButton}
                   onPress={() => handleEditNote(index)}
                 >
                   <Text style={styles.actionText}>Edit</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.deleteButton, darkMode && styles.darkDeleteButton]}
+                  style={styles.deleteButton}
                   onPress={() => handleDeleteNote(index)}
                 >
                   <Text style={styles.actionText}>Delete</Text>
@@ -151,16 +145,15 @@ export default function TabTwoScreen() {
 
       {/* Input note section */}
       <TextInput
-        style={[styles.input, darkMode && styles.darkInput]}
+        style={styles.input}
         placeholder="Write your note..."
-        placeholderTextColor={darkMode ? "#bbb" : "#888"}
         value={note}
         onChangeText={setNote}
       />
 
       {/* Custom Create or Edit button */}
       <TouchableOpacity
-        style={[styles.addButton, darkMode && styles.darkAddButton]}
+        style={styles.addButton}
         onPress={handleCreateOrEditNote}
       >
         <Text style={styles.addButtonText}>
@@ -178,18 +171,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: "#ffffff",
   },
-  darkContainer: {
-    backgroundColor: "#121212",
-  },
   title: {
     fontSize: 26,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
     color: "#6200ea",
-  },
-  darkTitle: {
-    color: "#bb86fc",
   },
   emptyContainer: {
     flex: 1,
@@ -202,9 +189,6 @@ const styles = StyleSheet.create({
     color: "#6200ea",
     fontStyle: "italic",
   },
-  darkEmptyText: {
-    color: "#bb86fc",
-  },
   input: {
     height: 50,
     borderColor: "#ddd",
@@ -215,15 +199,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     fontSize: 20,
   },
-  darkInput: {
-    backgroundColor: "#333333",
-    borderColor: "#555555",
-  },
   notesContainer: {
     marginTop: 20,
-  },
-  darkNotesContainer: {
-    backgroundColor: "#1e1e1e",
   },
   note: {
     padding: 15,
@@ -237,16 +214,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 20,
   },
-  darkNote: {
-    backgroundColor: "#1e1e1e",
-    borderColor: "#bb86fc",
+  scrollableText: {
+    maxHeight: 200,
   },
   noteText: {
     fontSize: 20,
     color: "#333",
-  },
-  darkNoteText: {
-    color: "#eee",
   },
   actions: {
     flexDirection: "row",
@@ -257,16 +230,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginRight: 5,
   },
-  darkEditButton: {
-    backgroundColor: "#bb86fc",
-  },
   deleteButton: {
     backgroundColor: "#ff4d4f",
     padding: 8,
     borderRadius: 5,
-  },
-  darkDeleteButton: {
-    backgroundColor: "#ff3d3d",
   },
   actionText: {
     color: "#fff",
@@ -279,23 +246,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 20,
   },
-  darkAddButton: {
-    backgroundColor: "#bb86fc",
-  },
   addButtonText: {
     color: "#fff",
     fontSize: 18,
-    fontWeight: "bold",
-  },
-  toggleButton: {
-    backgroundColor: "#6200ea",
-    padding: 10,
-    borderRadius: 5,
-    alignSelf: "flex-end",
-    marginBottom: 10,
-  },
-  toggleButtonText: {
-    color: "#fff",
     fontWeight: "bold",
   },
 });
