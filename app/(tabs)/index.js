@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   FlatList,
+  Switch, // Importing Switch for toggle
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Calendar } from "react-native-calendars";
@@ -17,6 +18,7 @@ export default function App() {
   const [tasks, setTasks] = useState({});
   const [checkedTasks, setCheckedTasks] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
+  const [darkMode, setDarkMode] = useState(false); // State for dark mode
 
   // Load tasks from AsyncStorage
   const loadTasks = async () => {
@@ -42,10 +44,7 @@ export default function App() {
   // Save checked tasks to AsyncStorage
   const saveCheckedTasks = async (updatedCheckedTasks) => {
     try {
-      await AsyncStorage.setItem(
-        "checkedTasks",
-        JSON.stringify(updatedCheckedTasks)
-      );
+      await AsyncStorage.setItem("checkedTasks", JSON.stringify(updatedCheckedTasks));
     } catch (error) {
       console.error("Failed to save checked tasks:", error);
     }
@@ -68,9 +67,7 @@ export default function App() {
   // Delete a task
   const deleteTask = (id) => {
     const updatedTasks = { ...tasks };
-    updatedTasks[selectedDate] = updatedTasks[selectedDate].filter(
-      (task) => task.id !== id
-    );
+    updatedTasks[selectedDate] = updatedTasks[selectedDate].filter((task) => task.id !== id);
     if (updatedTasks[selectedDate].length === 0) {
       delete updatedTasks[selectedDate];
     }
@@ -100,8 +97,16 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Select a Date and Add Your Task</Text>
+    <View style={[styles.container, darkMode ? styles.darkContainer : styles.lightContainer]}>
+      <Text style={[styles.title, darkMode ? styles.darkTitle : styles.lightTitle]}>
+        Select a Date and Add Your Task
+      </Text>
+
+      {/* Dark Mode Switch */}
+      <View style={styles.switchContainer}>
+        <Text style={styles.switchText}>Dark Mode</Text>
+        <Switch value={darkMode} onValueChange={setDarkMode} />
+      </View>
 
       {/* Calendar */}
       <Calendar
@@ -120,10 +125,11 @@ export default function App() {
 
       {/* Task Input */}
       <TextInput
-        style={styles.textInput}
+        style={[styles.textInput, darkMode ? styles.darkTextInput : styles.lightTextInput]}
         value={text}
         onChangeText={setText}
         placeholder="Enter your task"
+        placeholderTextColor={darkMode ? "#aaa" : "#888"} // Change placeholder color based on mode
       />
       <TouchableOpacity style={styles.addButton} onPress={addTask}>
         <Text style={styles.addButtonText}>Add Task</Text>
@@ -147,31 +153,19 @@ export default function App() {
               duration={500}
               style={[styles.taskItem, isChecked && styles.checkedTask]}
             >
-              <TouchableOpacity
-                onPress={() => toggleCheckTask(item.id)}
-                style={styles.checkButton}
-              >
+              <TouchableOpacity onPress={() => toggleCheckTask(item.id)} style={styles.checkButton}>
                 <FontAwesome
                   name={isChecked ? "check-square-o" : "square-o"}
                   size={24}
-                  color="#C"
+                  color={darkMode ? "#fff" : "#6200ea"} // Change icon color based on mode
                 />
               </TouchableOpacity>
-              <Text
-                style={[styles.taskText, isChecked && styles.checkedTaskText]}
-              >
+              <Text style={[styles.taskText, isChecked && styles.checkedTaskText]}>
                 {item.text}
               </Text>
               {/* Delete button */}
-              <TouchableOpacity
-                onPress={() => deleteTask(item.id)}
-                style={styles.deleteButton}
-              >
-                <Animatable.Text
-                  animation="bounceIn"
-                  duration={800}
-                  style={styles.deleteButtonText}
-                >
+              <TouchableOpacity onPress={() => deleteTask(item.id)} style={styles.deleteButton}>
+                <Animatable.Text animation="bounceIn" duration={800} style={styles.deleteButtonText}>
                   ❌
                 </Animatable.Text>
               </TouchableOpacity>
@@ -180,7 +174,9 @@ export default function App() {
         }}
         keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No tasks for this day.</Text>
+          <Text style={[styles.emptyText, darkMode ? styles.darkEmptyText : styles.lightEmptyText]}>
+            No tasks for this day.
+          </Text>
         }
       />
     </View>
@@ -191,7 +187,12 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     flex: 1,
-    backgroundColor: "#f9f9f9",
+  },
+  darkContainer: {
+    backgroundColor: "#121212", // Dark mode background
+  },
+  lightContainer: {
+    backgroundColor: "#f9f9f9", // Light mode background
   },
   title: {
     fontSize: 24,
@@ -199,14 +200,27 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
+  darkTitle: {
+    color: "#fff", // Dark mode title color
+  },
+  lightTitle: {
+    color: "#333", // Light mode title color
+  },
   textInput: {
     padding: 15,
     borderColor: "#ddd",
     borderWidth: 1,
     borderRadius: 8,
-    backgroundColor: "#fff",
     marginBottom: 20,
     fontSize: 20,
+  },
+  darkTextInput: {
+    backgroundColor: "#333", // Dark mode input background
+    color: "#fff", // Dark mode input text color
+  },
+  lightTextInput: {
+    backgroundColor: "#fff", // Light mode input background
+    color: "#333", // Light mode input text color
   },
   addButton: {
     backgroundColor: "#6200ea",
@@ -220,50 +234,57 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   taskItem: {
-    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
     marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
+  darkTaskItem: {
+    backgroundColor: "#1e1e1e", // Dark mode task item background
+  },
+  lightTaskItem: {
+    backgroundColor: "#fff", // Light mode task item background
+  },
   checkButton: {
     marginRight: 10,
   },
-
-  checkText: {
-    fontSize: 24,
-    color: "#6200ea",
-  },
-  checkedButton: {
-    fontSize: 50,
-  },
   checkedTask: {
-    backgroundColor: "#e0e0e0", // rang kamtar baraye task-haye check shodeh
+    backgroundColor: "#e0e0e0", // Lighter color for checked tasks
   },
   taskText: {
     fontSize: 18,
     color: "#333",
   },
   checkedTaskText: {
-    textDecorationLine: "line-through", // khat keshidan ro neveshteh
-    color: "#888", // kam rang kardan neveshteh
+    textDecorationLine: "line-through",
+    color: "#888",
   },
   emptyText: {
     fontSize: 16,
-    color: "#888",
     textAlign: "center",
     marginTop: 20,
+  },
+  darkEmptyText: {
+    color: "#bbb", // Dark mode empty text color
+  },
+  lightEmptyText: {
+    color: "#888", // Light mode empty text color
   },
   deleteButton: {
     marginLeft: 10,
   },
   deleteButtonText: {
-    color: "red",
+    fontSize: 24,
+  },
+  switchContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 20,
+  },
+  switchText: {
     fontSize: 18,
   },
 });
