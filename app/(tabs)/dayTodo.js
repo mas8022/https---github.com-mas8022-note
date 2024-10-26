@@ -80,7 +80,7 @@ const ReminderPage = () => {
             <Text style={styles.reminderTime}>{new Date(item.time).toLocaleTimeString()}</Text>
           </View>
           <TouchableOpacity onPress={() => handleRemoveReminder(item.id)}>
-            <MaterialIcons name="delete" size={30} color={isDarkMode ? '#bb86fc' : '#6200ea'} />
+            <MaterialIcons name="delete" size={30} color={isDarkMode ? '#6200ea' : '#6200ea'} />
           </TouchableOpacity>
         </View>
       </View>
@@ -142,7 +142,7 @@ const createStyles = (isDarkMode) =>
     },
     inputContainer: {
       borderWidth: 1,
-      borderColor: isDarkMode ? '#bb86fc' : '#ccc',
+      borderColor: isDarkMode ? '#6200ea' : '#ccc',
       padding: 10,
       marginBottom: 20,
       borderRadius: 5,
@@ -154,7 +154,7 @@ const createStyles = (isDarkMode) =>
     },
     textInput: {
       borderWidth: 1,
-      borderColor: isDarkMode ? '#bb86fc' : '#ccc',
+      borderColor: isDarkMode ? '#6200ea' : '#ccc',
       padding: 10,
       marginBottom: 20,
       borderRadius: 5,
@@ -163,7 +163,7 @@ const createStyles = (isDarkMode) =>
       textAlign: 'center',
     },
     button: {
-      backgroundColor: isDarkMode ? '#bb86fc' : '#6200ea',
+      backgroundColor: isDarkMode ? '#6200ea' : '#6200ea',
       padding: 15,
       borderRadius: 5,
       alignItems: 'center',

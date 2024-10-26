@@ -109,7 +109,6 @@ export default function App() {
         Select a Date and Add Your Task
       </Text>
 
-      {/* Calendar */}
       <Calendar
         theme={{
           backgroundColor: isDarkMode ? "#333" : "#fff",
@@ -229,7 +228,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   darkAddButton: {
-    backgroundColor: "#bb86fc",
+    backgroundColor: "#6200ea",
   },
   addButtonText: {
     color: "#fff",

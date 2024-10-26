@@ -22,7 +22,7 @@ export default function TabTwoScreen() {
 
   const colorScheme = useColorScheme();
   const isDarkMode = colorScheme === "dark";
-  
+
   // Load saved notes from AsyncStorage
   useEffect(() => {
     const loadNotes = async () => {
@@ -101,8 +101,17 @@ export default function TabTwoScreen() {
   };
 
   return (
-    <View style={[styles.container, isDarkMode ? styles.darkContainer : styles.lightContainer]}>
-      <Text style={[styles.title, isDarkMode ? styles.darkText : styles.lightText]}>Notes App</Text>
+    <View
+      style={[
+        styles.container,
+        isDarkMode ? styles.darkContainer : styles.lightContainer,
+      ]}
+    >
+      <Text
+        style={[styles.title, isDarkMode ? styles.darkText : styles.lightText]}
+      >
+        Notes App
+      </Text>
 
       {savedNotes.length === 0 ? (
         <Animated.View
@@ -114,28 +123,52 @@ export default function TabTwoScreen() {
             },
           ]}
         >
-          <Text style={[styles.emptyText, isDarkMode ? styles.darkText : styles.lightText]}>
+          <Text
+            style={[
+              styles.emptyText,
+              isDarkMode ? styles.darkText : styles.lightText,
+            ]}
+          >
             There are no notes!
           </Text>
         </Animated.View>
       ) : (
         <ScrollView style={styles.notesContainer}>
           {savedNotes.map((item, index) => (
-            <View key={index} style={[styles.note, isDarkMode ? styles.darkNote : styles.lightNote]}>
+            <View
+              key={index}
+              style={[
+                styles.note,
+                isDarkMode ? styles.darkNote : styles.lightNote,
+              ]}
+            >
               <ScrollView style={styles.scrollableText}>
-                <Text style={[styles.noteText, isDarkMode ? styles.darkText : styles.lightText]}>{item.text}</Text>
+                <Text
+                  style={[
+                    styles.noteText,
+                    isDarkMode ? styles.darkText : styles.lightText,
+                  ]}
+                >
+                  {item.text}
+                </Text>
               </ScrollView>
 
               <View style={styles.actions}>
                 <TouchableOpacity
-                  style={[styles.editButton, isDarkMode ? styles.darkButton : styles.lightButton]}
+                  style={[
+                    styles.editButton,
+                    isDarkMode ? styles.darkButton : styles.lightButton,
+                  ]}
                   onPress={() => handleEditNote(index)}
                 >
                   <Text style={styles.actionText}>Edit</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.deleteButton, isDarkMode ? styles.darkButton : styles.lightButton]}
+                  style={[
+                    styles.deleteButton,
+                    isDarkMode ? styles.darkButton : styles.lightButton,
+                  ]}
                   onPress={() => handleDeleteNote(index)}
                 >
                   <Text style={styles.actionText}>Delete</Text>
@@ -147,7 +180,10 @@ export default function TabTwoScreen() {
       )}
 
       <TextInput
-        style={[styles.input, isDarkMode ? styles.darkInput : styles.lightInput]}
+        style={[
+          styles.input,
+          isDarkMode ? styles.darkInput : styles.lightInput,
+        ]}
         placeholder="Write your note..."
         placeholderTextColor={isDarkMode ? "#aaa" : "#888"}
         value={note}
@@ -155,7 +191,10 @@ export default function TabTwoScreen() {
       />
 
       <TouchableOpacity
-        style={[styles.addButton, isDarkMode ? styles.darkButton : styles.lightButton]}
+        style={[
+          styles.addButton,
+          isDarkMode ? styles.darkButton : styles.lightButton,
+        ]}
         onPress={handleCreateOrEditNote}
       >
         <Text style={styles.addButtonText}>
@@ -186,9 +225,6 @@ const styles = StyleSheet.create({
   },
   darkText: {
     color: "#ffffff",
-  },
-  lightText: {
-    color: "#6200ea",
   },
   emptyContainer: {
     flex: 1,
@@ -227,6 +263,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: 15
   },
   darkNote: {
     backgroundColor: "#333333",
