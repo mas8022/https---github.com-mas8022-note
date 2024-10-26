@@ -10,6 +10,7 @@ import {
   Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useColorScheme } from "react-native";
 
 export default function TabTwoScreen() {
   const [note, setNote] = useState("");
@@ -19,6 +20,9 @@ export default function TabTwoScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current; // For fade-in animation
   const scaleAnim = useRef(new Animated.Value(0.8)).current; // For scaling animation
 
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
+  
   // Load saved notes from AsyncStorage
   useEffect(() => {
     const loadNotes = async () => {
@@ -70,13 +74,11 @@ export default function TabTwoScreen() {
     if (note.trim()) {
       let updatedNotes;
       if (isEditing && currentIndex !== null && !!savedNotes.length) {
-        // Edit existing note
         updatedNotes = [...savedNotes];
         updatedNotes[currentIndex].text = note;
         setIsEditing(false);
         setCurrentIndex(null);
       } else {
-        // Create new note
         updatedNotes = [...savedNotes, { text: note }];
       }
 
@@ -99,10 +101,9 @@ export default function TabTwoScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Notes App</Text>
+    <View style={[styles.container, isDarkMode ? styles.darkContainer : styles.lightContainer]}>
+      <Text style={[styles.title, isDarkMode ? styles.darkText : styles.lightText]}>Notes App</Text>
 
-      {/* Display message if no notes exist */}
       {savedNotes.length === 0 ? (
         <Animated.View
           style={[
@@ -113,26 +114,28 @@ export default function TabTwoScreen() {
             },
           ]}
         >
-          <Text style={styles.emptyText}>There are no notes!</Text>
+          <Text style={[styles.emptyText, isDarkMode ? styles.darkText : styles.lightText]}>
+            There are no notes!
+          </Text>
         </Animated.View>
       ) : (
         <ScrollView style={styles.notesContainer}>
           {savedNotes.map((item, index) => (
-            <View key={index} style={styles.note}>
+            <View key={index} style={[styles.note, isDarkMode ? styles.darkNote : styles.lightNote]}>
               <ScrollView style={styles.scrollableText}>
-                <Text style={styles.noteText}>{item.text}</Text>
+                <Text style={[styles.noteText, isDarkMode ? styles.darkText : styles.lightText]}>{item.text}</Text>
               </ScrollView>
 
               <View style={styles.actions}>
                 <TouchableOpacity
-                  style={styles.editButton}
+                  style={[styles.editButton, isDarkMode ? styles.darkButton : styles.lightButton]}
                   onPress={() => handleEditNote(index)}
                 >
                   <Text style={styles.actionText}>Edit</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.deleteButton}
+                  style={[styles.deleteButton, isDarkMode ? styles.darkButton : styles.lightButton]}
                   onPress={() => handleDeleteNote(index)}
                 >
                   <Text style={styles.actionText}>Delete</Text>
@@ -143,17 +146,16 @@ export default function TabTwoScreen() {
         </ScrollView>
       )}
 
-      {/* Input note section */}
       <TextInput
-        style={styles.input}
+        style={[styles.input, isDarkMode ? styles.darkInput : styles.lightInput]}
         placeholder="Write your note..."
+        placeholderTextColor={isDarkMode ? "#aaa" : "#888"}
         value={note}
         onChangeText={setNote}
       />
 
-      {/* Custom Create or Edit button */}
       <TouchableOpacity
-        style={styles.addButton}
+        style={[styles.addButton, isDarkMode ? styles.darkButton : styles.lightButton]}
         onPress={handleCreateOrEditNote}
       >
         <Text style={styles.addButtonText}>
@@ -169,6 +171,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: "space-between",
+  },
+  darkContainer: {
+    backgroundColor: "#121212",
+  },
+  lightContainer: {
     backgroundColor: "#ffffff",
   },
   title: {
@@ -176,6 +183,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
+  },
+  darkText: {
+    color: "#ffffff",
+  },
+  lightText: {
     color: "#6200ea",
   },
   emptyContainer: {
@@ -186,61 +198,70 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 22,
-    color: "#6200ea",
     fontStyle: "italic",
   },
   input: {
     height: 50,
-    borderColor: "#ddd",
-    borderWidth: 1,
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 20,
-    backgroundColor: "#f0f0f0",
     fontSize: 20,
+  },
+  darkInput: {
+    backgroundColor: "#333333",
+    color: "#ffffff",
+    borderColor: "#555555",
+  },
+  lightInput: {
+    backgroundColor: "#f0f0f0",
+    color: "#000000",
+    borderColor: "#ddd",
   },
   notesContainer: {
     marginTop: 20,
   },
   note: {
     padding: 15,
-    backgroundColor: "#ffffff",
     borderRadius: 10,
     marginVertical: 5,
-    borderColor: "#6200ea",
-    borderWidth: 1,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: 20,
   },
-  scrollableText: {
-    maxHeight: 200,
+  darkNote: {
+    backgroundColor: "#333333",
+    borderColor: "#444444",
+  },
+  lightNote: {
+    backgroundColor: "#ffffff",
+    borderColor: "#6200ea",
   },
   noteText: {
     fontSize: 20,
-    color: "#333",
   },
   actions: {
     flexDirection: "row",
   },
   editButton: {
-    backgroundColor: "#6200ea",
     padding: 8,
     borderRadius: 5,
     marginRight: 5,
   },
   deleteButton: {
-    backgroundColor: "#ff4d4f",
     padding: 8,
     borderRadius: 5,
+  },
+  darkButton: {
+    backgroundColor: "#6200ea",
+  },
+  lightButton: {
+    backgroundColor: "#6200ea",
   },
   actionText: {
     color: "#fff",
     fontWeight: "bold",
   },
   addButton: {
-    backgroundColor: "#6200ea",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",

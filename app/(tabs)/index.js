@@ -11,6 +11,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Calendar } from "react-native-calendars";
 import * as Animatable from "react-native-animatable";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { useColorScheme } from 'react-native';
 
 export default function App() {
   const [text, setText] = useState("");
@@ -18,7 +19,8 @@ export default function App() {
   const [checkedTasks, setCheckedTasks] = useState([]);
   const [selectedDate, setSelectedDate] = useState("");
 
-
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
 
   // Load tasks from AsyncStorage
   const loadTasks = async () => {
@@ -102,11 +104,22 @@ export default function App() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Select a Date and Add Your Task</Text>
+    <View style={[styles.container, isDarkMode && styles.darkContainer]}>
+      <Text style={[styles.title, isDarkMode && styles.darkTitle]}>
+        Select a Date and Add Your Task
+      </Text>
 
       {/* Calendar */}
       <Calendar
+        theme={{
+          backgroundColor: isDarkMode ? "#333" : "#fff",
+          calendarBackground: isDarkMode ? "#333" : "#fff",
+          textSectionTitleColor: isDarkMode ? "#b6c1cd" : "#2d4150",
+          selectedDayBackgroundColor: isDarkMode ? "#6200ea" : "#f5f5f5",
+          selectedDayTextColor: isDarkMode ? "#ffffff" : "#000000",
+          dayTextColor: isDarkMode ? "#ffffff" : "#2d4150",
+          textDisabledColor: isDarkMode ? "#d9e1e8" : "#d9e1e8",
+        }}
         onDayPress={onDayPress}
         markedDates={{
           ...Object.keys(tasks).reduce((acc, date) => {
@@ -122,24 +135,22 @@ export default function App() {
 
       {/* Task Input */}
       <TextInput
-        style={styles.textInput}
+        style={[styles.textInput, isDarkMode && styles.darkTextInput]}
         value={text}
         onChangeText={setText}
         placeholder="Enter your task"
+        placeholderTextColor={isDarkMode ? "#ccc" : "#666"}
       />
-      <TouchableOpacity style={styles.addButton} onPress={addTask}>
+      <TouchableOpacity style={[styles.addButton, isDarkMode && styles.darkAddButton]} onPress={addTask}>
         <Text style={styles.addButtonText}>Add Task</Text>
       </TouchableOpacity>
 
       {/* Task List for Selected Date */}
       <FlatList
         data={(tasks[selectedDate] || []).sort((a, b) => {
-          // Move checked tasks to the bottom
           const aChecked = checkedTasks.includes(a.id);
           const bChecked = checkedTasks.includes(b.id);
-          if (aChecked && !bChecked) return 1;
-          if (!aChecked && bChecked) return -1;
-          return 0;
+          return aChecked - bChecked;
         })}
         renderItem={({ item }) => {
           const isChecked = checkedTasks.includes(item.id);
@@ -147,33 +158,24 @@ export default function App() {
             <Animatable.View
               animation="fadeIn"
               duration={500}
-              style={[styles.taskItem, isChecked && styles.checkedTask]}
+              style={[
+                styles.taskItem,
+                isChecked && styles.checkedTask,
+                isDarkMode && styles.darkTaskItem,
+              ]}
             >
-              <TouchableOpacity
-                onPress={() => toggleCheckTask(item.id)}
-                style={styles.checkButton}
-              >
+              <TouchableOpacity onPress={() => toggleCheckTask(item.id)} style={styles.checkButton}>
                 <FontAwesome
                   name={isChecked ? "check-square-o" : "square-o"}
                   size={24}
-                  color="#C"
+                  color={isDarkMode ? "#6200ea" : "#333"}
                 />
               </TouchableOpacity>
-              <Text
-                style={[styles.taskText, isChecked && styles.checkedTaskText]}
-              >
+              <Text style={[styles.taskText, isChecked && styles.checkedTaskText, isDarkMode && styles.darkTaskText]}>
                 {item.text}
               </Text>
-              {/* Delete button */}
-              <TouchableOpacity
-                onPress={() => deleteTask(item.id)}
-                style={styles.deleteButton}
-              >
-                <Animatable.Text
-                  animation="bounceIn"
-                  duration={800}
-                  style={styles.deleteButtonText}
-                >
+              <TouchableOpacity onPress={() => deleteTask(item.id)} style={styles.deleteButton}>
+                <Animatable.Text animation="bounceIn" duration={800} style={styles.deleteButtonText}>
                   ❌
                 </Animatable.Text>
               </TouchableOpacity>
@@ -181,9 +183,7 @@ export default function App() {
           );
         }}
         keyExtractor={(item) => item.id?.toString() || Math.random().toString()}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No tasks for this day.</Text>
-        }
+        ListEmptyComponent={<Text style={[styles.emptyText, isDarkMode && styles.darkEmptyText]}>No tasks for this day.</Text>}
       />
     </View>
   );
@@ -195,11 +195,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f9f9f9",
   },
+  darkContainer: {
+    backgroundColor: "#121212",
+  },
   title: {
     fontSize: 24,
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
+    color: "#333",
+  },
+  darkTitle: {
+    color: "#fff",
   },
   textInput: {
     padding: 15,
@@ -209,12 +216,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     marginBottom: 20,
     fontSize: 20,
+    color: "#333",
+  },
+  darkTextInput: {
+    backgroundColor: "#333",
+    color: "#eee",
   },
   addButton: {
     backgroundColor: "#6200ea",
     padding: 15,
     borderRadius: 8,
     marginBottom: 20,
+  },
+  darkAddButton: {
+    backgroundColor: "#bb86fc",
   },
   addButtonText: {
     color: "#fff",
@@ -233,33 +248,31 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
-  checkButton: {
-    marginRight: 10,
-  },
-
-  checkText: {
-    fontSize: 24,
-    color: "#6200ea",
-  },
-  checkedButton: {
-    fontSize: 50,
+  darkTaskItem: {
+    backgroundColor: "#333",
   },
   checkedTask: {
-    backgroundColor: "#e0e0e0", // rang kamtar baraye task-haye check shodeh
+    backgroundColor: "#e0e0e0",
   },
   taskText: {
     fontSize: 18,
     color: "#333",
   },
+  darkTaskText: {
+    color: "#fff",
+  },
   checkedTaskText: {
-    textDecorationLine: "line-through", // khat keshidan ro neveshteh
-    color: "#888", // kam rang kardan neveshteh
+    textDecorationLine: "line-through",
+    color: "#888",
   },
   emptyText: {
     fontSize: 16,
     color: "#888",
     textAlign: "center",
     marginTop: 20,
+  },
+  darkEmptyText: {
+    color: "#bbb",
   },
   deleteButton: {
     marginLeft: 10,
